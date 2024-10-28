@@ -11,9 +11,16 @@ return {
   },
   cmd = 'Neotree',
   keys = {
-    { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+    -- here's the keymap that sets the relative numbers
+    { '\\', ':Neotree reveal right<CR>:set relativenumber<CR>', desc = 'NeoTree reveal', silent = true },
   },
   opts = {
+    event_handlers = {
+      event = 'neo_tree_buffer_enter',
+      handler = function()
+        vim.opt_local.relativenumber = true
+      end,
+    },
     filesystem = {
       window = {
         mappings = {
