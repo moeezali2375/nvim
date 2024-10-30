@@ -15,6 +15,6 @@ return {
         buffer_inactive_target = true,
       },
     }
-    vim.cmd.colorscheme 'synthwave84'
+    -- vim.cmd.colorscheme 'synthwave84'
   end,
 }
