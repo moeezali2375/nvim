@@ -69,4 +69,28 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'RestResponsePre',
+  callback = function()
+    local req = _G.rest_request
+    local res = _G.rest_response
 
+    -- Decode URL if necessary
+    -- req.url = url_decode(req.url)
+
+    -- Trim trailing whitespace
+    -- res.body = trim_trailing_whitespace(res.body)
+
+    -- Format the response body using jq
+    local handle = io.popen('echo "' .. res.body:gsub('"', '\\"') .. '" | jq .') -- Escape quotes for jq
+    if handle then
+      local formatted = handle:read '*a'
+      handle:close()
+
+      -- Update the response body if formatting succeeded
+      if formatted and #formatted > 0 then
+        res.body = formatted
+      end
+    end
+  end,
+})

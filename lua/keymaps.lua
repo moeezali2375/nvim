@@ -33,3 +33,25 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- NOTE: Cycle through buffers
 vim.api.nvim_set_keymap('n', '<C-p>', ':bprevious<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<C-n>', ':bnext<CR>', { noremap = true, silent = true })
+
+-- NOTE: REST
+vim.api.nvim_buf_set_keymap(0, 'n', '<leader>rr', "<cmd>lua require('kulala').run()<cr>", { noremap = true, silent = true, desc = 'Execute the request' })
+vim.api.nvim_buf_set_keymap(0, 'n', '[', "<cmd>lua require('kulala').jump_prev()<cr>", { noremap = true, silent = true, desc = 'Jump to the previous request' })
+
+vim.api.nvim_buf_set_keymap(0, 'n', ']', "<cmd>lua require('kulala').jump_next()<cr>", { noremap = true, silent = true, desc = 'Jump to the next request' })
+
+vim.api.nvim_buf_set_keymap(
+  0,
+  'n',
+  '<leader>i',
+  "<cmd>lua require('kulala').inspect()<cr>",
+  { noremap = true, silent = true, desc = 'Inspect the current request' }
+)
+
+vim.api.nvim_buf_set_keymap(
+  0,
+  'n',
+  '<leader>t',
+  "<cmd>lua require('kulala').toggle_view()<cr>",
+  { noremap = true, silent = true, desc = 'Toggle between body and headers' }
+)

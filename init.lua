@@ -14,6 +14,12 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+-- vim.filetype.add {
+--   extension = {
+--     ['http'] = 'http',
+--   },
+-- }
+
 require('lazy').setup({
 
   -- LSP Plugins
@@ -311,6 +317,7 @@ require('lazy').setup({
             'rafamadriz/friendly-snippets',
             config = function()
               require('luasnip.loaders.from_vscode').lazy_load()
+              require('luasnip.loaders.from_lua').load { paths = { './lua/snippets/' } }
             end,
           },
         },
