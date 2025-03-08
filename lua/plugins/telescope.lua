@@ -62,9 +62,27 @@ return {
     vim.keymap.set('n', '<leader><leader>', function()
       require('telescope.builtin').find_files {
         hidden = true, -- Show hidden files (like .env)
-        no_ignore = true, -- Respect .gitignore
-        no_ignore_parent = true, -- Respect .gitignore from parent directories
-        find_command = { 'rg', '--files', '--hidden', '--no-ignore', '--glob', '!.git/*', '--glob', '!venv/*', '--glob', '!node_modules/*' },
+        -- no_ignore = true, -- Respect .gitignore
+        -- no_ignore_parent = true, -- Respect .gitignore from parent directories
+        -- find_command = { 'rg', '--files', '--hidden', '--no-ignore', '--glob', '!.git/*', '--glob', '!*/venv/*', '--glob', '!*/node_modules/*' },
+        -- find_command={'--hidden', '--.gitignore', '.env*'}
+        -- find_command = { 'rg', '--files', '--hidden', '--no-ignore', '--glob', '!.git/*', '--glob', '!**/venv/*', '--glob', '!**/node_modules/*' },
+        find_command = {
+          'rg',
+          '--files',
+          '--hidden',
+          '--no-ignore',
+          '--glob',
+          '!.git/*',
+          '--glob',
+          '!**/venv/*',
+          '--glob',
+          '!**/node_modules/*',
+          '--glob',
+          '!**/__pycache__/*',
+          '--glob',
+          '!**/.DS_Store',
+        },
       }
     end, { desc = '[S]earch [A]ll Files (respecting .gitignore)' })
     vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
