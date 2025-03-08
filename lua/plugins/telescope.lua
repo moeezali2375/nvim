@@ -58,7 +58,15 @@ return {
     local builtin = require 'telescope.builtin'
     vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
     vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-    vim.keymap.set('n', '<leader><leader>', builtin.find_files, { desc = 'Search Files' })
+    -- vim.keymap.set('n', '<leader><leader>', builtin.find_files, { desc = 'Search Files' })
+    vim.keymap.set('n', '<leader><leader>', function()
+      require('telescope.builtin').find_files {
+        hidden = true, -- Show hidden files (like .env)
+        no_ignore = true, -- Respect .gitignore
+        no_ignore_parent = true, -- Respect .gitignore from parent directories
+        find_command = { 'rg', '--files', '--hidden', '--no-ignore', '--glob', '!.git/*', '--glob', '!venv/*', '--glob', '!node_modules/*' },
+      }
+    end, { desc = '[S]earch [A]ll Files (respecting .gitignore)' })
     vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
     vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
     vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
