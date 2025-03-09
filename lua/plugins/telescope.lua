@@ -82,6 +82,8 @@ return {
           '!**/__pycache__/*',
           '--glob',
           '!**/.DS_Store',
+          '--glob',
+          '!**/dist/*',
         },
       }
     end, { desc = '[S]earch [A]ll Files (respecting .gitignore)' })
