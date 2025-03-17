@@ -77,6 +77,8 @@ return {
           '--glob',
           '!**/venv/*',
           '--glob',
+          '!**/.next/*',
+          '--glob',
           '!**/node_modules/*',
           '--glob',
           '!**/__pycache__/*',
