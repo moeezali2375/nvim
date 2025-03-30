@@ -72,24 +72,29 @@ vim.opt.scrolloff = 10
 vim.api.nvim_create_autocmd('User', {
   pattern = 'RestResponsePre',
   callback = function()
-    local req = _G.rest_request
     local res = _G.rest_response
 
-    -- Decode URL if necessary
-    -- req.url = url_decode(req.url)
+    local is_json, json_data = pcall(vim.json.decode, res.body)
 
-    -- Trim trailing whitespace
-    -- res.body = trim_trailing_whitespace(res.body)
+    if is_json then
+      local cmd = 'echo "' .. res.body:gsub('"', '\\"') .. '" | js-beautify'
+      local handle = io.popen(cmd)
 
-    -- Format the response body using jq
-    local handle = io.popen('echo "' .. res.body:gsub('"', '\\"') .. '" | jq .') -- Escape quotes for jq
-    if handle then
-      local formatted = handle:read '*a'
-      handle:close()
+      if handle then
+        local formatted = handle:read '*a'
+        local exit_code = handle:close()
 
-      -- Update the response body if formatting succeeded
-      if formatted and #formatted > 0 then
-        res.body = formatted
+        if formatted and #formatted > 0 then
+          res.body = formatted
+        else
+          if exit_code ~= 0 then
+            print('js-beautify error, exit code: ' .. exit_code)
+          else
+            print 'js-beautify output was empty'
+          end
+        end
+      else
+        print 'failed to run js-beautify'
       end
     end
   end,
