@@ -69,33 +69,51 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+local function read_file(filename)
+  local file = io.open(filename, 'r') -- Open file for reading
+  if not file then
+    error('Could not open file: ' .. filename)
+  end
+  local content = file:read '*all' -- Read entire file
+  file:close()
+  return content
+end
+
+local function write_file(filename, data)
+  local file = io.open(filename, 'w') -- Open file in write mode
+  if file then
+    file:write(data) -- Write to file
+    file:close() -- Close the file
+  else
+    print('Error opening file: ' .. filename)
+  end
+end
+
+local function ensure_dir_exists(dir)
+  os.execute('mkdir -p ' .. dir)
+  -- os.execute('touch ' .. dir .. '/formatted.json ' .. dir .. '/unformatted.json')
+end
+
 vim.api.nvim_create_autocmd('User', {
   pattern = 'RestResponsePre',
   callback = function()
+    local home = os.getenv 'HOME' -- Get absolute home directory
+    local rest_dir = home .. '/.config/nvim/.rest/' -- Absolute path
+
     local res = _G.rest_response
 
     local is_json, json_data = pcall(vim.json.decode, res.body)
 
     if is_json then
-      local cmd = 'echo "' .. res.body:gsub('"', '\\"') .. '" | js-beautify'
-      local handle = io.popen(cmd)
+      ensure_dir_exists(rest_dir) -- Ensure directory exists
+      local unformatted_file = rest_dir .. 'unformatted.json'
+      local formatted_file = rest_dir .. 'formatted.json'
 
-      if handle then
-        local formatted = handle:read '*a'
-        local exit_code = handle:close()
+      write_file(unformatted_file, res.body) -- Write unformatted response
+      os.execute('jq . ' .. unformatted_file .. ' > ' .. formatted_file) -- Format JSON
 
-        if formatted and #formatted > 0 then
-          res.body = formatted
-        else
-          if exit_code ~= 0 then
-            print('js-beautify error, exit code: ' .. exit_code)
-          else
-            print 'js-beautify output was empty'
-          end
-        end
-      else
-        print 'failed to run js-beautify'
-      end
+      local formattedJson = read_file(formatted_file) -- Read formatted JSON
+      res.body = formattedJson
     end
   end,
 })
