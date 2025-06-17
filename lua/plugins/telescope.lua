@@ -1,3 +1,4 @@
+-- Add this to your Telescope configuration file (or wherever you define the plugin)
 return {
   'nvim-telescope/telescope.nvim',
   event = 'VimEnter',
@@ -6,43 +7,33 @@ return {
     'nvim-lua/plenary.nvim',
     {
       'nvim-telescope/telescope-fzf-native.nvim',
-
       build = 'make',
-
       cond = function()
         return vim.fn.executable 'make' == 1
       end,
     },
     { 'nvim-telescope/telescope-ui-select.nvim' },
-
     { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
   },
   config = function()
-    --
-    -- After running this command, a window will open up and you're able to
-    -- type in the prompt window. You'll see a list of `help_tags` options and
-    -- a corresponding preview of the help.
-    --
-    -- Two important keymaps to use while in Telescope are:
-    --  - Insert mode: <c-/>
-    --  - Normal mode: ?
-    --
-    -- This opens a window that shows you all of the keymaps for the current
-    -- Telescope picker. This is really useful to discover what Telescope can
-    -- do as well as how to actually do it!
+    -- Function to check if a command exists
+    local function command_exists(cmd)
+      return vim.fn.executable(cmd) == 1
+    end
+
+    -- Check for ripgrep
+    if not command_exists 'rg' then
+      vim.notify(
+        'Ripgrep (rg) is not installed. Telescope find_files (and live_grep) will not work optimally. Please install it: https://github.com/BurntSushi/ripgrep#installation',
+        vim.log.levels.WARN,
+        { title = 'Telescope Dependency Warning' }
+      )
+      -- You might also choose to disable the find_files keymap or use a fallback if rg is not found.
+      -- For now, we'll just notify the user.
+    end
 
     -- [[ Configure Telescope ]]
-    -- See `:help telescope` and `:help telescope.setup()`
     require('telescope').setup {
-      -- You can put your default mappings / updates / etc. in here
-      --  All the info you're looking for is in `:help telescope.setup()`
-      --
-      -- defaults = {
-      --   mappings = {
-      --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-      --   },
-      -- },
-      -- pickers = {}
       extensions = {
         ['ui-select'] = {
           require('telescope.themes').get_dropdown(),
@@ -58,16 +49,15 @@ return {
     local builtin = require 'telescope.builtin'
     vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
     vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-    -- vim.keymap.set('n', '<leader><leader>', builtin.find_files, { desc = 'Search Files' })
+
+    -- Your find_files mapping
     vim.keymap.set('n', '<leader><leader>', function()
-      require('telescope.builtin').find_files {
-        hidden = true, -- Show hidden files (like .env)
-        -- no_ignore = true, -- Respect .gitignore
-        -- no_ignore_parent = true, -- Respect .gitignore from parent directories
-        -- find_command = { 'rg', '--files', '--hidden', '--no-ignore', '--glob', '!.git/*', '--glob', '!*/venv/*', '--glob', '!*/node_modules/*' },
-        -- find_command={'--hidden', '--.gitignore', '.env*'}
-        -- find_command = { 'rg', '--files', '--hidden', '--no-ignore', '--glob', '!.git/*', '--glob', '!**/venv/*', '--glob', '!**/node_modules/*' },
-        find_command = {
+      -- Conditionally use your custom find_command only if rg is present
+      local find_opts = {
+        hidden = true,
+      }
+      if command_exists 'rg' then
+        find_opts.find_command = {
           'rg',
           '--files',
           '--hidden',
@@ -86,12 +76,28 @@ return {
           '!**/.DS_Store',
           '--glob',
           '!**/dist/*',
-        },
-      }
+        }
+      else
+        -- Fallback if rg is not found (e.g., use the default 'find' command)
+        -- Or just let Telescope use its default behavior without a custom find_command
+        -- vim.notify('Using fallback find_files (slower). Install ripgrep for better performance.', vim.log.levels.INFO)
+      end
+      require('telescope.builtin').find_files(find_opts)
     end, { desc = '[S]earch [A]ll Files (respecting .gitignore)' })
+
     vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
     vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-    vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+    vim.keymap.set('n', '<leader>sg', function()
+      if not command_exists 'rg' then
+        vim.notify(
+          'Ripgrep (rg) is not installed. Live grep requires ripgrep. Please install it: https://github.com/BurntSushi/ripgrep#installation',
+          vim.log.levels.ERROR,
+          { title = 'Telescope Dependency Error' }
+        )
+        return -- Exit the function if rg is not present
+      end
+      builtin.live_grep()
+    end, { desc = '[S]earch by [G]rep' })
     vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
     vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
     vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -107,8 +113,16 @@ return {
     end, { desc = '[/] Fuzzily search in current buffer' })
 
     -- It's also possible to pass additional configuration options.
-    --  See `:help telescope.builtin.live_grep()` for information about particular keys
+    --  See `:help telescope.builtin.live_grep()` for information about particular keys
     vim.keymap.set('n', '<leader>s/', function()
+      if not command_exists 'rg' then
+        vim.notify(
+          'Ripgrep (rg) is not installed. Live grep in open files requires ripgrep. Please install it.',
+          vim.log.levels.ERROR,
+          { title = 'Telescope Dependency Error' }
+        )
+        return
+      end
       builtin.live_grep {
         grep_open_files = true,
         prompt_title = 'Live Grep in Open Files',
