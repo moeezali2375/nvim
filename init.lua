@@ -4,6 +4,21 @@ require 'keymaps'
 
 require 'autocommands'
 
+-- NOTE: Mason packages auto install
+local ok, registry = pcall(require, 'mason-registry')
+if not ok then
+  return
+end
+
+local packages = require 'mason-packages' -- adjust the path if needed
+
+for _, pkg_name in ipairs(packages) do
+  local ok, pkg = pcall(registry.get_package, pkg_name)
+  if ok and not pkg:is_installed() then
+    pkg:install()
+  end
+end
+
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
