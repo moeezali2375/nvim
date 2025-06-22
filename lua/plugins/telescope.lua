@@ -102,6 +102,17 @@ return {
     vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
     vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
     vim.keymap.set('n', '<leader>b', builtin.buffers, { desc = '[ ] Find existing [B]uffers' })
+    local diagnostics_enabled = true
+
+    vim.keymap.set('n', '<leader>vd', function()
+      diagnostics_enabled = not diagnostics_enabled
+      vim.diagnostic.config {
+        virtual_text = diagnostics_enabled,
+        underline = diagnostics_enabled,
+        signs = diagnostics_enabled,
+      }
+      vim.notify('Diagnostics ' .. (diagnostics_enabled and 'enabled' or 'disabled'))
+    end, { desc = '[V]irtual [D]iagnostics Toggle' })
 
     -- Slightly advanced example of overriding default behavior and theme
     vim.keymap.set('n', '<leader>/', function()
