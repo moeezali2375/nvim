@@ -61,7 +61,7 @@ return {
           ['<C-b>'] = cmp.mapping.scroll_docs(-4), -- Scroll documentation back
           ['<C-f>'] = cmp.mapping.scroll_docs(4), -- Scroll documentation forward
 
-          ['<C-y>'] = cmp.mapping.confirm { select = true }, -- Accept the selected completion.
+          -- ['<C-y>'] = cmp.mapping.confirm { select = true }, -- Accept the selected completion.
           -- This will auto-import if your LSP supports it
           -- and expand snippets if the LSP sent a snippet.
 
@@ -74,7 +74,7 @@ return {
             end
           end,
 
-          ['<C-Space>'] = cmp.mapping.complete {}, -- Manually trigger completion
+          ['<C-y>'] = cmp.mapping.complete {}, -- Manually trigger completion
 
           -- Navigate through snippet placeholders (jump points)
           ['<C-l>'] = cmp.mapping(function()
