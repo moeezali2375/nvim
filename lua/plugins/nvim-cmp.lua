@@ -34,6 +34,8 @@ return {
       'hrsh7th/cmp-path', -- File path completion
       'hrsh7th/cmp-buffer', -- Buffer words completion (uncomment if desired)
       'hrsh7th/cmp-nvim-lsp-signature-help',
+      'hrsh7th/cmp-cmdline',
+      'hrsh7th/cmp-emoji',
     },
     config = function()
       local cmp = require 'cmp'
@@ -101,6 +103,8 @@ return {
           { name = 'path' }, -- File path suggestions
           { name = 'buffer' }, -- Buffer word suggestions (uncomment if desired)
           { name = 'nvim_lsp_signature_help' },
+          { name = 'cmdline' },
+          { name = 'emoji' },
         },
       }
     end,
