@@ -77,3 +77,9 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+vim.cmd [[
+  highlight DiffAdd    cterm=bold ctermbg=green   guibg=green
+  highlight DiffChange cterm=bold ctermbg=yellow  guibg=yellow
+  highlight DiffDelete cterm=bold ctermbg=red     guibg=red
+  highlight DiffText   cterm=bold ctermbg=blue    guibg=blue
+]]
