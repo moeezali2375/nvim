@@ -11,7 +11,7 @@ return {
           {
             filetype = 'neo-tree',
             text = 'Finder',
-            highlight="directory",
+            highlight = 'directory',
             separator = true,
           },
         },
@@ -20,6 +20,7 @@ return {
         modified_icon = '●',
         show_close_icon = false,
         show_buffer_close_icons = true,
+        sort_by = 'insert_after_current', -- Add this to sort buffers in order of opening
       },
     }
   end,
