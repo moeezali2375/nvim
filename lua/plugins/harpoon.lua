@@ -4,11 +4,13 @@ return {
   dependencies = { 'nvim-lua/plenary.nvim' },
   config = function()
     local harpoon = require 'harpoon'
+    local extensions = require 'harpoon.extensions'
 
     -- REQUIRED
     harpoon:setup()
     -- REQUIRED
 
+    harpoon:extend(extensions.builtins.command_on_nav 'UfoEnableFold')
     -- Keymaps with descriptions
     vim.keymap.set('n', '<leader>a', function()
       harpoon:list():add()
