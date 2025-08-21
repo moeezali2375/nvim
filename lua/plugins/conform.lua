@@ -2,7 +2,7 @@ return {
   {
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
-    cmd = { 'ConformInfo' }, -- Command to check conform status
+    cmd = { 'ConformInfo' },
     keys = {
       {
         '<leader>f',
@@ -25,19 +25,42 @@ return {
         html = { 'prettier' },
         css = { 'prettier' },
         json = { 'prettier' },
+        sql = { 'sql_formatter' },
+        mysql = { 'sql_formatter' },
+        postgresql = { 'sql_formatter' },
       },
-      -- Uncomment and customize `format_on_save` if you want per-language control
-      -- format_on_save = function(bufnr)
-      --   local disable_filetypes = { c = true, cpp = true }
-      --   local lsp_format_opt = 'fallback'
-      --   if disable_filetypes[vim.bo[bufnr].filetype] then
-      --     lsp_format_opt = 'never'
-      --   end
-      --   return {
-      --     timeout_ms = 500,
-      --     lsp_format = lsp_format_opt,
-      --   }
-      -- end,
+
+      formatters = {
+        sql_formatter = {
+          command = 'sql-formatter',
+          stdin = true,
+          args = function(_, ctx)
+            -- 🗺️ Map extensions to dialects
+            local dialects = {
+              psql = 'postgresql',
+              mysql = 'mysql',
+              sqlite = 'sqlite',
+              bq = 'bigquery',
+              sql = 'sql', -- fallback
+            }
+
+            -- Try file extension first
+            local ext = ctx.filename:match '^.+%.([^.]+)$'
+            if ext and dialects[ext] then
+              return { '--language', dialects[ext] }
+            end
+
+            -- Fallback: check buffer's filetype
+            local ft_map = {
+              mysql = 'mysql',
+              postgresql = 'postgresql',
+              sql = 'sql',
+            }
+            local ft = vim.bo[ctx.buf].filetype
+            return { '--language', ft_map[ft] or 'sql' }
+          end,
+        },
+      },
     },
   },
 }
